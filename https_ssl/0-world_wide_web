@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 # script to config domain zone to point to load balancer
 # add more subdomains and display info about them
+case $subdomain in
+        "www") ip_address="18.204.225.111";;
+        "lb-01") ip_address="54.210.47.110";;
+        "web-01") ip_address="34.198.248.145";;
+        "web-02") ip_address="54.89.38.100";;
+        *) echo "Invalid subdomain"; return;;
+    esac
 
 domain=$1
 if [ "$#" -eq 2 ]; then
