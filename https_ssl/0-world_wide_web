@@ -1,46 +1,14 @@
 #!/usr/bin/env bash
-#world wide web
-display_info() {
-    subdomain=$1
-    domain=$2
+# script to config domain zone to point to load balancer
+# add more subdomains and display info about them
 
-    case $subdomain in
-        "www") ip_address="54.210.47.110";;
-        "lb-01") ip_address="18.204.225.111";;
-        "web-01") ip_address="54.147.175.242";;
-        "web-02") ip_address="54.242.59.215";;
-        *) echo "Invalid subdomain"; return;;
-    esac
-
-    result=$(dig +short ${subdomain}.${domain})
-
-    if [ -z "$result" ]; then
-        echo "The subdomain ${subdomain} does not exist for ${domain}"
-    else
-	    echo "The subdomain ${subdomain} is a A record and points to ${ip_address}"
-    fi
-}
-
-display_default_info() {
-    domain=$1
-    subdomains=("www" "lb-01" "web-01" "web-02")
-
-    for subdomain in "${subdomains[@]}"; do
-        case $subdomain in
-            "www") ip_address="54.210.47.110";;
-            "lb-01") ip_address="54.210.47.110";;
-            "web-01") ip_address="34.198.248.145";;
-            "web-02") ip_address="54.89.38.100";;
-        esac
-
-        echo "The subdomain ${subdomain} is a A record and points to ${ip_address}"
-    done
-}
-
-if [ $# -eq 1 ]; then
-    display_default_info $1
-elif [ $# -eq 2 ]; then
-    display_info $2 $1
+domain=$1
+if [ "$#" -eq 2 ]; then
+   sub=$2
 else
-    echo "Usage: $0 domain [subdomain]"
+	sub=("www" "lb-01" "web-01" "web-02")
 fi
+for subdomain in "${sub[@]}"; do
+    echo -n "The subdomain $subdomain"
+    dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -n -1 | awk '{ print " is a " $4 " record and points to " $5}'
+done
