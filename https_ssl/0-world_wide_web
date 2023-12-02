@@ -7,16 +7,16 @@ display_info() {
     # Define IP addresses for subdomains
     case $subdomain in
         "www")
-            ip_address="54.210.47.110"
+            ip_address="18.204.225.111"
             ;;
         "lb-01")
-            ip_address="54.210.47.110"
+            ip_address="18.204.225.111"
             ;;
         "web-01")
-            ip_address="34.198.248.145"
+            ip_address="54.147.175.242"
             ;;
         "web-02")
-            ip_address="54.89.38.100"
+            ip_address="54.242.59.215"
             ;;
         *)
             echo "Invalid subdomain"
