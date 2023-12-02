@@ -30,11 +30,7 @@ display_info() {
     if [ -z "$result" ]; then
         echo "The subdomain ${subdomain} does not exist for ${domain}"
     else
-        if [ "$result" == "$ip_address" ]; then
             echo "The subdomain ${subdomain} is a A record and points to ${ip_address}"
-        else
-            echo "The subdomain ${subdomain} points to an unexpected IP address: ${result}"
-        fi
     fi
 }
 
