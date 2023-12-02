@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-
+#Takes one or two arguments of a domain and subdomain
+#Returns the ip address the subdomain points to
 display_info() {
     subdomain=$1
     domain=$2
