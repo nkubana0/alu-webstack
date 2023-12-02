@@ -1,21 +1,35 @@
 #!/usr/bin/env bash
 # script to config domain zone to point to load balancer
 # add more subdomains and display info about them
-case $subdomain in
-        "www") ip_address="18.204.225.111";;
-        "lb-01") ip_address="54.210.47.110";;
-        "web-01") ip_address="34.198.248.145";;
-        "web-02") ip_address="54.89.38.100";;
-        *) echo "Invalid subdomain"; return;;
-    esac
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 <domain> [subdomain]"
+    exit 1
+fi
 
 domain=$1
+
 if [ "$#" -eq 2 ]; then
-   sub=$2
+    sub=("$2")
 else
-	sub=("www" "lb-01" "web-01" "web-02")
+    sub=("www" "lb-01" "web-01" "web-02")
 fi
+
 for subdomain in "${sub[@]}"; do
     echo -n "The subdomain $subdomain"
-    dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -n -1 | awk '{ print " is a " $4 " record and points to " $5}'
+
+    result=$(dig +short "$subdomain.$domain")
+
+    if [ -z "$result" ]; then
+        echo " does not exist for $domain"
+    else
+        record_type=$(dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -n -1 | awk '{ print $4 }')
+        echo -n " is a $record_type record and points to"
+
+        # Loop through all IP addresses for the subdomain
+        for ip_address in $result; do
+            echo -n " $ip_address"
+        done
+
+        echo ""  # New line for clarity
+    fi
 done
