@@ -1,35 +1,18 @@
 #!/usr/bin/env bash
-# script to config domain zone to point to load balancer
-# add more subdomains and display info about them
-if [ "$#" -lt 1 ]; then
-    echo "Usage: $0 <domain> [subdomain]"
-    exit 1
-fi
+# bash file for the work
 
-domain=$1
 
-if [ "$#" -eq 2 ]; then
-    sub=("$2")
+if [ $# == 2 ]; then
+    domain=$1
+    subdomain=$2
+    SUB_DOMAINS=$subdomain
 else
-    sub=("www" "lb-01" "web-01" "web-02")
+    domain=$1
+    SUB_DOMAINS=("www" "lb-01" "web-01" "web-02")
 fi
 
-for subdomain in "${sub[@]}"; do
-    echo -n "The subdomain $subdomain"
-
-    result=$(dig +short "$subdomain.$domain")
-
-    if [ -z "$result" ]; then
-        echo " does not exist for $domain"
-    else
-        record_type=$(dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -n -1 | awk '{ print $4 }')
-        echo -n " is a $record_type record and points to"
-
-        # Loop through all IP addresses for the subdomain
-        for ip_address in $result; do
-            echo -n " $ip_address"
-        done
-
-        echo ""  # New line for clarity
-    fi
+for sub in ${SUB_DOMAINS[@]}; do
+    record_type="$(dig "$sub.$domain" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{print $4}')"
+    destination=$(dig +short "$sub.$domain" | awk '{print $1}')
+    echo "The subdomain $sub is a $record_type record and points to $destination"
 done
