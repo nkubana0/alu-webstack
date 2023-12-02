@@ -1,31 +1,38 @@
 #!/usr/bin/env bash
 # Function to display information about a subdomain
 display_info() {
-    local subdomain=$1
-    local domain=$2
+    subdomain=$1
+    domain=$2
 
-    local result=$(dig +short ${subdomain}.${domain})
+    case $subdomain in
+        "www") ip_address="18.204.225.111";;
+        "lb-01") ip_address="18.204.225.111";;
+        "web-01") ip_address="54.147.175.242";;
+        "web-02") ip_address="54.242.59.215";;
+        *) echo "Invalid subdomain"; return;;
+    esac
+
+    result=$(dig +short ${subdomain}.${domain})
 
     if [ -z "$result" ]; then
         echo "The subdomain ${subdomain} does not exist for ${domain}"
     else
-        local record_type=$(dig +short ${subdomain}.${domain} | awk 'NR==1{print $4}')
-        echo "The subdomain ${subdomain} is a A record and points to ${result}"
+        if [ "$result" == "$ip_address" ]; then
+            echo "The subdomain ${subdomain} is a A record and points to ${ip_address}"
+        else
+            echo "The subdomain ${subdomain} points to an unexpected IP address: ${result}"
+        fi
     fi
 }
 
-# Function for default subdomains
 display_default_info() {
-    local domain=$1
-
-    local subdomains=("www" "lb-01" "web-01" "web-02")
+    domain=$1
+    subdomains=("www" "lb-01" "web-01" "web-02")
 
     for subdomain in "${subdomains[@]}"; do
         display_info $subdomain $domain
     done
 }
-
-# Main 
 
 if [ $# -eq 1 ]; then
     display_default_info $1
