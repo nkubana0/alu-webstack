@@ -1,61 +1,14 @@
 #!/usr/bin/env bash
-# Function to display information about a subdomain
-display_info() {
-    local subdomain=$1
-    local domain=$2
+# script to config domain zone to point to load balancer
+# add more subdomains and display info about them
 
-    # Define IP addresses for subdomains
-    case $subdomain in
-        "www")
-            ip_address="18.204.225.111"
-            ;;
-        "lb-01")
-            ip_address="18.204.225.111"
-            ;;
-        "web-01")
-            ip_address="54.147.175.242"
-            ;;
-        "web-02")
-            ip_address="54.242.59.215"
-            ;;
-        *)
-            echo "Invalid subdomain"
-            return
-            ;;
-    esac
-
-    # Perform DNS lookup for the subdomain
-    local result=$(dig +short ${subdomain}.${domain})
-
-    if [ -z "$result" ]; then
-        echo "The subdomain ${subdomain} does not exist for ${domain}"
-    else
-            echo "The subdomain ${subdomain} is a A record and points to ${result}"
-    fi
-}
-
-# Function to display information about default subdomains
-display_default_info() {
-    local domain=$1
-
-    # Default subdomains
-    local subdomains=("www" "lb-01" "web-01" "web-02")
-
-    for subdomain in "${subdomains[@]}"; do
-        display_info $subdomain $domain
-    done
-}
-
-# Main script
-
-if [ $# -eq 1 ]; then
-    # When only the parameter domain is provided
-    display_default_info $1
-elif [ $# -eq 2 ]; then
-    # When passing domain and subdomain parameters
-    display_info $2 $1
+domain=$1
+if [ "$#" -eq 2 ]; then
+   sub=$2
 else
-    # Invalid number of arguments
-    echo "Usage: $0 domain [subdomain]"
+	sub=("www" "lb-01" "web-01" "web-02")
 fi
-
+for subdomain in "${sub[@]}"; do
+    echo -n "The subdomain $subdomain"
+    dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -n -1 | awk '{ print " is a " $4 " record and points to " $5}'
+done
