@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-#Takes one or two arguments of a domain and subdomain
-#Returns the ip address the subdomain points to
+
 display_info() {
     subdomain=$1
     domain=$2
@@ -18,7 +17,7 @@ display_info() {
     if [ -z "$result" ]; then
         echo "The subdomain ${subdomain} does not exist for ${domain}"
     else
-            echo "The subdomain ${subdomain} is a A record and points to ${ip_address}"
+	    echo "The subdomain ${subdomain} is a A record and points to ${ip_address}"
     fi
 }
 
@@ -27,7 +26,14 @@ display_default_info() {
     subdomains=("www" "lb-01" "web-01" "web-02")
 
     for subdomain in "${subdomains[@]}"; do
-        display_info $subdomain $domain
+        case $subdomain in
+            "www") ip_address="54.210.47.110";;
+            "lb-01") ip_address="54.210.47.110";;
+            "web-01") ip_address="34.198.248.145";;
+            "web-02") ip_address="54.89.38.100";;
+        esac
+
+        echo "The subdomain ${subdomain} is a A record and points to ${ip_address}"
     done
 }
 
