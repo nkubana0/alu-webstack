@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Function to display information about a subdomain
 display_info() {
     local subdomain=$1
@@ -15,7 +15,7 @@ display_info() {
     fi
 }
 
-# Function to display information about default subdomains
+# Function for default subdomains
 display_default_info() {
     local domain=$1
 
@@ -27,7 +27,7 @@ display_default_info() {
     done
 }
 
-# Main script
+# Main 
 
 if [ $# -eq 1 ]; then
     # When only the parameter domain is provided
