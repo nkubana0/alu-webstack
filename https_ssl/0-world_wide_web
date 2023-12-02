@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+#world wide web
 display_info() {
     subdomain=$1
     domain=$2
