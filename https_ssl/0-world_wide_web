@@ -1,43 +1,41 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Function to display information about a subdomain
 display_info() {
-    domain=$1
-    subdomain=$2
+    local subdomain=$1
+    local domain=$2
 
-    # Use dig to retrieve DNS information for the subdomain
-    result=$(dig ${subdomain}.${domain} | grep -A1 'ANSWER SECTION:')
+    # Perform DNS lookup for the subdomain
+    local result=$(dig +short ${subdomain}.${domain})
 
-    # Extract record type and destination from the dig result using awk
-    record_type=$(echo "$result" | awk '/IN\s/ {print $4}')
-    destination=$(echo "$result" | awk '/IN\s/ {print $5}')
-
-    # Display the information
-    echo "The subdomain ${subdomain} is a ${record_type} record and points to ${destination}"
-}
-
-# Main script
-main() {
-    domain=$1
-    subdomain=$2
-
-    # Default subdomains to check
-    subdomains=("www" "lb-01" "web-01" "web-02")
-
-    # If subdomain is provided, display information for the specified subdomain
-    if [ -n "$subdomain" ]; then
-        display_info "$domain" "$subdomain"
+    if [ -z "$result" ]; then
+        echo "The subdomain ${subdomain} does not exist for ${domain}"
     else
-        # Display information for default subdomains
-        for sub in "${subdomains[@]}"; do
-            display_info "$domain" "$sub"
-        done
+        local record_type=$(dig +short ${subdomain}.${domain} | awk 'NR==1{print $4}')
+        echo "The subdomain ${subdomain} is a ${record_type} record and points to ${result}"
     fi
 }
 
-# Check if both domain and subdomain arguments are provided
-if [ "$#" -lt 1 ]; then
-    echo "Usage: $0 <domain> [subdomain]"
-    exit 1
-fi
+# Function to display information about default subdomains
+display_default_info() {
+    local domain=$1
 
-main "$1" "$2"
+    # Default subdomains
+    local subdomains=("www" "lb-01" "web-01" "web-02")
+
+    for subdomain in "${subdomains[@]}"; do
+        display_info $subdomain $domain
+    done
+}
+
+# Main script
+
+if [ $# -eq 1 ]; then
+    # When only the parameter domain is provided
+    display_default_info $1
+elif [ $# -eq 2 ]; then
+    # When passing domain and subdomain parameters
+    display_info $2 $1
+else
+    # Invalid number of arguments
+    echo "Usage: $0 domain [subdomain]"
+fi
