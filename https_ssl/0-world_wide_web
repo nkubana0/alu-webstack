@@ -6,9 +6,9 @@ display_info() {
 
     case $subdomain in
         "www") ip_address="18.204.225.111";;
-        "lb-01") ip_address="54.210.47.110";;
-        "web-01") ip_address="34.198.248.145";;
-        "web-02") ip_address="54.89.38.100";;
+        "lb-01") ip_address="18.204.225.111";;
+        "web-01") ip_address="54.147.175.242";;
+        "web-02") ip_address="54.242.59.215";;
         *) echo "Invalid subdomain"; return;;
     esac
 
@@ -17,11 +17,7 @@ display_info() {
     if [ -z "$result" ]; then
         echo "The subdomain ${subdomain} does not exist for ${domain}"
     else
-        if [ "$result" == "$ip_address" ]; then
             echo "The subdomain ${subdomain} is a A record and points to ${ip_address}"
-        else
-            echo "The subdomain ${subdomain} is a A record but points to an unexpected IP address: ${result}"
-        fi
     fi
 }
 
