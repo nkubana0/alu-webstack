@@ -1,0 +1,29 @@
+global
+    log 127.0.0.1 local0 notice
+    maxconn 2000
+    user haproxy
+    group haproxy
+
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    retries 3
+    option redispatch
+    timeout connect  5000
+    timeout client  10000
+    timeout server  10000
+
+frontend www.shiftafrica.tech
+        mode http
+        bind :80
+        bind :443 ssl crt /etc/letsencrypt/live/www.shiftafrica.tech/combine.pem
+http-request redirect code 301 scheme https unless { ssl_fc }
+        default_backend shiftafrica
+
+backend shiftafrica
+        mode http
+        balance roundrobin
+        server 5779-web-01 54.147.175.242:80 check
+        server 5779-web-02 54.242.59.215:80 check
